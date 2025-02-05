@@ -1,0 +1,16 @@
+[project]
+name = "margin-calibration"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "elissamim",email = "mouad.el-issami@igf.finances.gouv.fr"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["cvxpy"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
