@@ -10,12 +10,16 @@ class MarginCalibration:
         calibration_matrix,
         calibration_target,
         calibration_method,
+        lower_bound=None,
+        upper_bound=None
     ):
 
         self.sampling_probabilities = sampling_probabilities
         self.calibration_matrix = calibration_matrix
         self.calibration_target = calibration_target
         self.calibration_method = calibration_method
+        self.lower_bound=lower_bound
+        self.upper_bound=upper_bound
 
     def initialize_sampling_weights(self):
         return np.array([1 / prob_i for prob_i in self.sampling_probabilities])
@@ -54,20 +58,20 @@ class MarginCalibration:
     def constraint(self, calibration_weights):
         return self.calibration_matrix.T @ calibration_weights - self.calibration_target
 
-    def calibration(self, lower_bound=None, upper_bound=None):
+    def calibration(self):
 
         constraints = {"type": "eq", "fun": self.constraint}
 
         x0 = self.initialize_sampling_weights()
 
         if self.calibration_method == "truncated_linear":
-            if isinstance(lower_bound, (int, float)) and isinstance(
-                upper_bound, (int, float)
+            if isinstance(self.lower_bound, (int, float)) and isinstance(
+                self.upper_bound, (int, float)
             ):
-                if (lower_bound < 1) and (upper_bound > 1):
+                if (self.lower_bound < 1) and (self.upper_bound > 1):
                     sampling_weights = self.initialize_sampling_weights()
                     bounds = [
-                        (lower_bound * d_k, upper_bound * d_k)
+                        (self.lower_bound * d_k, self.upper_bound * d_k)
                         for d_k in sampling_weights
                     ]
                 else:
