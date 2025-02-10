@@ -4,28 +4,51 @@ import sys
 sys.path.append("../src")
 from margin_calibration import MarginCalibration
 
-def test_pseudo_distance_functions():
+sampling_probabilities = np.random.uniform(low=0, high=1, size=(10, 1))
+calibration_matrix = np.random.uniform(low=0, high=100, size=(10, 2))
+calibration_target = calibration_matrix.sum(axis=0)*100
+calibration_target = calibration_target.reshape(-1, 1)
+
+def test_linear_distance():
     
-    sampling_probabilities = np.random.uniform(low=0, high=1, size=(10, 1))
-    calibration_matrix = np.random.uniform(low=0, high=100, size=(10, 2))
-    calibration_target = calibration_matrix.sum(axis=0)*100
-    calibration_target = calibration_target.reshape(-1, 1)
+    mc=MarginCalibration(sampling_probabilities,
+                        calibration_matrix,
+                        calibration_target,
+                        calibration_method = "linear")
     
-    dict_methods = {
-        "linear":_linear_method,
-        "truncated_linear":_linear_method,
-        "logit":_logit_method,
-        "ranking_ratio":_ranking_ratio_method
-    }
+    assert mc._linear_method(1, 1) == 0
 
-    for method in dict_methods.keys():
-        mc=MarginCalibration(sampling_probabilities,
-                            calibration_matrix,
-                            calibration_target,
-                            calibration_method = method)
-        assert mc.dict_methods[method](1, 1) == 0
+def test_truncated_linear_distance():
 
+    mc=MarginCalibration(sampling_probabilities,
+                        calibration_matrix,
+                        calibration_target,
+                        calibration_method = "truncated_linear",
+                        lower_bound = 0.5,
+                        upper_bound = 1.5)
+    
+    assert mc._linear_method(1, 1) == 0
 
+def test_logit_distance():
+
+    mc=MarginCalibration(sampling_probabilities,
+                        calibration_matrix,
+                        calibration_target,
+                        calibration_method = "logit",
+                        lower_bound=0.5,
+                        upper_bound=1.5)
+
+    assert mc._logit_method(1, 1) == 0
+
+def test_ranking_ratio_distance():
+
+    mc=MarginCalibration(sampling_probabilities,
+                        calibration_matrix,
+                        calibration_target,
+                        calibration_method = "ranking_ratio")
+    
+    assert mc._ranking_ratio_method(1, 1) == 0
+    
 
 if __name__ == "__main__":
     pytest.main()
