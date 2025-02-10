@@ -9,9 +9,11 @@ class MarginCalibration:
         sampling_probabilities,
         calibration_matrix,
         calibration_target,
-        calibration_method,
+        calibration_method="linear",
         lower_bound=None,
-        upper_bound=None
+        upper_bound=None,
+        penalty=None,
+        costs=None
     ):
 
         self.sampling_probabilities = sampling_probabilities
@@ -20,6 +22,8 @@ class MarginCalibration:
         self.calibration_method = calibration_method
         self.lower_bound=lower_bound
         self.upper_bound=upper_bound
+        self.penalty=penalty
+        self.costs=costs
 
     def initialize_sampling_weights(self):
         return np.array([1 / prob_i for prob_i in self.sampling_probabilities])
@@ -30,12 +34,21 @@ class MarginCalibration:
     def _ranking_ratio_method(self, w, d):
         return (w / d) * np.log(w / d) - (w / d) + 1
 
+    def _logit_method(self, w, d):
+        epsilon = 1e-8
+        x=w/d
+        a = (x-self.lower_bound)*np.log(np.maximum((x-self.lower_bound)/(1-self.lower_bound), epsilon))
+        b = (self.upper_bound-x)*np.log(np.maximum((self.upper_bound-x)/(self.upper_bound-1), epsilon))
+        c = (self.upper_bound-self.lower_bound)/((1-self.lower_bound)*(self.upper_bound-1))
+        return (a+b)/c
+
     def initialize_method(self):
 
         dict_method = {
             "linear": self._linear_method,
             "ranking_ratio": self._ranking_ratio_method,
             "truncated_linear": self._linear_method,
+            "logit": self._logit_method,
         }
         try:
             return dict_method[self.calibration_method]
@@ -48,23 +61,52 @@ class MarginCalibration:
 
     def objective(self, calibration_weights):
 
-        sampling_weights = self.initialize_sampling_weights()
+        if (self.penalty is None) and (self.costs is None):
 
-        return sum(
-            d_k * self.initialize_method()(w_k, d_k)
-            for w_k, d_k in zip(calibration_weights, sampling_weights)
-        )
+            sampling_weights = self.initialize_sampling_weights()
+    
+            return sum(
+                d_k * self.initialize_method()(w_k, d_k)
+                for w_k, d_k in zip(calibration_weights, sampling_weights)
+            )
+
+        elif (self.penalty is not None) and (self.costs is not None):
+
+            sampling_weights = self.initialize_sampling_weights()
+            total_target = self.calibration_target
+
+            distance = sum(
+                d_k * self.initialize_method()(w_k, d_k)
+                for w_k, d_k in zip(calibration_weights, sampling_weights)
+            )
+
+            margin_gap = self.calibration_matrix.T@calibration_weights-total_target
+            
+            cost = self.penalty*np.dot(margin_gap,np.diag(self.costs)@margin_gap)
+
+            return distance + cost
+
+        else:
+
+            raise ValueError("""Both 'penalty' and 'costs' must be given, 
+                            in case one is given.""")
 
     def constraint(self, calibration_weights):
         return self.calibration_matrix.T @ calibration_weights - self.calibration_target
 
     def calibration(self):
 
-        constraints = {"type": "eq", "fun": self.constraint}
-
+        if (self.penalty is None) and (self.costs is None):
+            constraints = {"type": "eq", "fun": self.constraint}
+        elif (self.penalty is not None) and (self.costs is not None):
+            constraints = None
+        else:
+            raise ValueError("""Both 'penalty' and 'costs' must be given, 
+                            in case one is given.""")
+        
         x0 = self.initialize_sampling_weights()
 
-        if self.calibration_method == "truncated_linear":
+        if self.calibration_method in ["truncated_linear", "logit"]:
             if isinstance(self.lower_bound, (int, float)) and isinstance(
                 self.upper_bound, (int, float)
             ):
@@ -81,7 +123,8 @@ class MarginCalibration:
                     )
             else:
                 raise TypeError(
-                    "'lower_bound' and 'upper_bound' must be numeric values"
+                    """'lower_bound' and 'upper_bound' must be numeric values
+                    when using 'truncated_linear' or 'logit' methods"""
                 )
         else:
             bounds = None
