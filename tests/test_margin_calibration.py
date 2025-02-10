@@ -48,8 +48,16 @@ def test_ranking_ratio_distance():
                         calibration_method = "ranking_ratio")
     
     assert mc._ranking_ratio_method(1, 1) == 0
-    
 
+def test_ndarray_creator():
+
+    mc=MarginCalibration(sampling_probabilities,
+                        calibration_matrix,
+                        calibration_target)
+
+    assert all(isinstance(x, np.ndarray)
+              for x in [mc.sampling_probabilities, mc.calibration_matrix, mc.calibration_target])
+    
 if __name__ == "__main__":
     pytest.main()
 
