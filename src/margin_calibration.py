@@ -112,10 +112,9 @@ class MarginCalibration:
     def constraint(self, calibration_weights):
         return self.calibration_matrix.T @ calibration_weights - self.calibration_target
 
-    def calibration(self,
-                   sampling_probabilities,
-                   calibration_matrix,
-                   calibration_target):
+    def calibration(
+        self, sampling_probabilities, calibration_matrix, calibration_target
+    ):
 
         self.sampling_probabilities = self._to_numpy(sampling_probabilities)
         self.calibration_matrix = self._to_numpy(calibration_matrix)
