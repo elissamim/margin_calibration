@@ -9,7 +9,11 @@ Le but d'un calage sur marges est de trouver des "poids de calage", $w_{k}$ pour
 
 Le calage de marges consiste ainsi à trouver les poids $\mathbf{w}=(w_{k})_{k \in \mathcal{s}}$ vérifiant :
 
-$\arg\min_{\mathbf{w}} \sum_{k \in \mathcal{s}} d_{k}G(\frac{w_{k}}{d_{k}})$
+$
+\begin{cases}
+\arg\min_{\mathbf{w}} \sum_{k \in \mathcal{s}} d_{k}G(\frac{w_{k}}{d_{k}})
+\end{cases}
+$
 
 
 # Margin calibration
