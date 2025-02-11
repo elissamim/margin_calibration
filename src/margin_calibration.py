@@ -4,6 +4,23 @@ from scipy.optimize import minimize
 
 
 class MarginCalibration:
+    """
+    A class for calibrating weights based on different calibration methods.
+
+    The class provides methods for weight calibration based on linear,
+    raking ratio, truncated linear, or logit methods, with options for 
+    penalty and cost constraints. The calibration process involves 
+    optimizing an objective function to match sampling probabilities to 
+    a calibration target.
+
+    Attributes:
+        calibration_method (str): The calibration method to use. Must be one of 
+                                  'linear', 'raking_ratio', 'truncated_linear', or 'logit'.
+        lower_bound (float or None): The lower bound for methods like 'logit'.
+        upper_bound (float or None): The upper bound for methods like 'logit'.
+        penalty (float or None): The penalty parameter for cost-based optimization.
+        costs (array-like or None): The cost associated with the calibration.
+    """
 
     def __init__(
         self,
@@ -13,7 +30,16 @@ class MarginCalibration:
         penalty=None,
         costs=None,
     ):
+        """
+        Initializes the MarginCalibration object.
 
+        Args:
+            calibration_method (str): The calibration method to use ('linear', 'raking_ratio', 'truncated_linear', 'logit').
+            lower_bound (float or None): The lower bound for calibration methods requiring it (e.g., 'logit').
+            upper_bound (float or None): The upper bound for calibration methods requiring it (e.g., 'logit').
+            penalty (float or None): Penalty for cost-based optimization.
+            costs (array-like or None): The cost matrix to be used in optimization.
+        """
         self.calibration_method = calibration_method
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
@@ -21,6 +47,18 @@ class MarginCalibration:
         self.costs = costs
 
     def _to_numpy(self, data: pd.DataFrame) -> np.ndarray:
+        """
+        Converts input data to a NumPy array.
+
+        Args:
+            data (pd.DataFrame, pd.Series, or np.ndarray): The data to convert.
+
+        Returns:
+            np.ndarray: The converted data.
+
+        Raises:
+            TypeError: If the input data is not a DataFrame, Series, or ndarray.
+        """
         if isinstance(data, pd.DataFrame):
             if data.shape[1] == 1:
                 return data.to_numpy().flatten()
@@ -36,15 +74,51 @@ class MarginCalibration:
             )
 
     def initialize_sampling_weights(self):
+        """
+        Initializes the sampling weights based on the sampling probabilities.
+
+        Returns:
+            np.ndarray: The initialized sampling weights.
+        """
         return np.array([1 / prob_i for prob_i in self.sampling_probabilities])
 
     def _linear_method(self, w, d):
+        """
+        Linear method for calibration.
+
+        Args:
+            w (float): The weight.
+            d (float): The distance.
+
+        Returns:
+            float: The computed value based on the linear method.
+        """
         return (w / d - 1) ** 2
 
     def _raking_ratio_method(self, w, d):
+        """
+        Raking ratio method for calibration.
+
+        Args:
+            w (float): The weight.
+            d (float): The distance.
+
+        Returns:
+            float: The computed value based on the raking ratio method.
+        """
         return (w / d) * np.log(w / d) - (w / d) + 1
 
     def _logit_method(self, w, d):
+        """
+        Logit method for calibration.
+
+        Args:
+            w (float): The weight.
+            d (float): The distance.
+
+        Returns:
+            float: The computed value based on the logit method.
+        """
         epsilon = 1e-8
         x = w / d
         a = (x - self.lower_bound) * np.log(
@@ -59,7 +133,15 @@ class MarginCalibration:
         return (a + b) / c
 
     def initialize_method(self):
+        """
+        Initializes the appropriate method based on the chosen calibration method.
 
+        Returns:
+            function: The method to use for calibration (e.g., linear, raking_ratio, logit).
+        
+        Raises:
+            ValueError: If an invalid calibration method is provided.
+        """
         dict_method = {
             "linear": self._linear_method,
             "raking_ratio": self._raking_ratio_method,
@@ -68,7 +150,6 @@ class MarginCalibration:
         }
         try:
             return dict_method[self.calibration_method]
-
         except KeyError:
             raise ValueError(
                 f"""Invalid value : {self.calibration_method}. 
@@ -76,7 +157,18 @@ class MarginCalibration:
             )
 
     def objective(self, calibration_weights):
+        """
+        Computes the objective function to minimize during calibration.
 
+        Args:
+            calibration_weights (np.ndarray): The calibration weights.
+
+        Returns:
+            float: The value of the objective function (sum of distances, possibly with penalty).
+        
+        Raises:
+            ValueError: If only one of 'penalty' or 'costs' is provided.
+        """
         if (self.penalty is None) and (self.costs is None):
 
             sampling_weights = self.initialize_sampling_weights()
@@ -110,12 +202,36 @@ class MarginCalibration:
             )
 
     def constraint(self, calibration_weights):
+        """
+        Defines the constraint for the optimization problem.
+
+        Args:
+            calibration_weights (np.ndarray): The calibration weights.
+
+        Returns:
+            np.ndarray: The result of the constraint (calibration matrix times weights minus the target).
+        """
         return self.calibration_matrix.T @ calibration_weights - self.calibration_target
 
     def calibration(
         self, sampling_probabilities, calibration_matrix, calibration_target
     ):
+        """
+        Performs the calibration optimization process.
 
+        Args:
+            sampling_probabilities (array-like): The sampling probabilities.
+            calibration_matrix (array-like): The calibration matrix.
+            calibration_target (array-like): The target values for calibration.
+
+        Returns:
+            OptimizeResult: The result of the optimization process.
+        
+        Raises:
+            ValueError: If the lower bound is not strictly less than 1, or the upper bound is not strictly greater than 1 for methods like 'logit'.
+            TypeError: If bounds are not numeric values when using methods like 'logit'.
+        """
+        # Store the passed values as instance variables
         self.sampling_probabilities = self._to_numpy(sampling_probabilities)
         self.calibration_matrix = self._to_numpy(calibration_matrix)
         self.calibration_target = self._to_numpy(calibration_target)
