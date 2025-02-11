@@ -7,9 +7,6 @@ class MarginCalibration:
 
     def __init__(
         self,
-        sampling_probabilities,
-        calibration_matrix,
-        calibration_target,
         calibration_method="linear",
         lower_bound=None,
         upper_bound=None,
@@ -17,9 +14,6 @@ class MarginCalibration:
         costs=None,
     ):
 
-        self.sampling_probabilities = self._to_numpy(sampling_probabilities)
-        self.calibration_matrix = self._to_numpy(calibration_matrix)
-        self.calibration_target = self._to_numpy(calibration_target)
         self.calibration_method = calibration_method
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
@@ -118,7 +112,14 @@ class MarginCalibration:
     def constraint(self, calibration_weights):
         return self.calibration_matrix.T @ calibration_weights - self.calibration_target
 
-    def calibration(self):
+    def calibration(self,
+                   sampling_probabilities,
+                   calibration_matrix,
+                   calibration_target):
+
+        self.sampling_probabilities = self._to_numpy(sampling_probabilities)
+        self.calibration_matrix = self._to_numpy(calibration_matrix)
+        self.calibration_target = self._to_numpy(calibration_target)
 
         if (self.penalty is None) and (self.costs is None):
             constraints = {"type": "eq", "fun": self.constraint}
