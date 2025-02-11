@@ -9,7 +9,9 @@ Le but d'un calage sur marges est de trouver des "poids de calage", $w_{k}$ pour
 
 Le calage de marges consiste ainsi à trouver les poids $\mathbf{w}=(w_{k})_{k \in \mathcal{s}}$ vérifiant :
 $$
+\usepackage{amsmath}
 \begin{cases}
+\operatorname*{argmin}_w_{k} f(x)
 \end{cases}
 $$
 
