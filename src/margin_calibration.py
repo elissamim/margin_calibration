@@ -47,7 +47,7 @@ class MarginCalibration:
     def _linear_method(self, w, d):
         return (w / d - 1) ** 2
 
-    def _ranking_ratio_method(self, w, d):
+    def _raking_ratio_method(self, w, d):
         return (w / d) * np.log(w / d) - (w / d) + 1
 
     def _logit_method(self, w, d):
@@ -68,7 +68,7 @@ class MarginCalibration:
 
         dict_method = {
             "linear": self._linear_method,
-            "ranking_ratio": self._ranking_ratio_method,
+            "raking_ratio": self._raking_ratio_method,
             "truncated_linear": self._linear_method,
             "logit": self._logit_method,
         }
@@ -78,7 +78,7 @@ class MarginCalibration:
         except KeyError:
             raise ValueError(
                 f"""Invalid value : {self.calibration_method}. 
-                Must be one of : 'linear', 'ranking_ratio', 'truncated_linear'"""
+                Must be one of : 'linear', 'raking_ratio', 'truncated_linear'"""
             )
 
     def objective(self, calibration_weights):

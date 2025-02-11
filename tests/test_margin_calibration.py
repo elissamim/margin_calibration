@@ -40,14 +40,14 @@ def test_logit_distance():
 
     assert mc._logit_method(1, 1) == 0
 
-def test_ranking_ratio_distance():
+def test_raking_ratio_distance():
 
     mc=MarginCalibration(sampling_probabilities,
                         calibration_matrix,
                         calibration_target,
-                        calibration_method = "ranking_ratio")
+                        calibration_method = "raking_ratio")
     
-    assert mc._ranking_ratio_method(1, 1) == 0
+    assert mc._raking_ratio_method(1, 1) == 0
 
 def test_ndarray_creator():
 
