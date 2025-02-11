@@ -9,7 +9,7 @@ Le but d'un calage sur marges est de trouver des "poids de calage", $w_{k}$ pour
 
 Le calage de marges consiste ainsi à trouver les poids $\mathbf{w}=(w_{k})_{k \in \mathcal{s}}$ vérifiant :
 
-$\arg\min_{\mathbf{w}} \sum_{k \in \mathcal{s}} d_{k}G(\frac{w_{k}}{d_{k}})$
+$\arg\min_{\mathbf{w}} \sum_{k \in \mathcal{s}} d_{k}G(\frac{w_{k}}{d_{k}})$, avec $G$ une pseudo-distance
 
 Sous la contrainte suivante : $X_{\mathcal{s}}^{'}\mathbf{w}=T_{X}$, où $X_{\mathcal{s}}$ correspond à la matrioce dont les colonnes dont les $X_{j}$ pour les différents individus de $\mathcal{s}$ et $T_{X}$ le vecteur dont chaque élément $j$ correspond à $T(X_{j})$.
 
