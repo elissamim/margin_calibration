@@ -6,7 +6,7 @@ Python Package for Margin Calibration methods
 
 - Margin calibration
 - Penalized margin calibration
-- Tighed bounded margin calibration
+- Tight bounded margin calibration
 - Several pseudo-distances implemented : Linear, Logit, Truncated Linear and Ranking Ratio
 
 ## Installation
