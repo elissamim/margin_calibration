@@ -11,7 +11,7 @@ Le calage de marges consiste ainsi à trouver les poids $\mathbf{w}=(w_{k})_{k \
 $$
 
 \begin{cases}
-\operatorname*{argmin}_{w_{k}} f(x)
+\operatorname*{argmin}_{w} f(x)
 \end{cases}
 
 $$
