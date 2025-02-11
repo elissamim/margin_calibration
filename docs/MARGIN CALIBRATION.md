@@ -8,11 +8,7 @@ On tire pour cela un échantillon $\mathcal{s}$ de $n$ éléments appartenant à
 Le but d'un calage sur marges est de trouver des "poids de calage", $w_{k}$ pour chaque $k \in \mathcal{s}$, permettant d'extrapoler à partir des valeurs individuelles des $X_{j}$ sur $\mathcal{s}$ et des totaux $T(X_{j})$ sur $\mathcal{U}$, la somme $Y = \sum_{k \in \mathcal{U}} y_{k} = \sum_{k \in \mathcal{s}} w_{k} y_{k}$ où les $w_{k}$ sont obtenus de telle sorte à être les plus proches que possible des poids de sondage $d_{k}=\frac{1}{\pi_{k}}$.
 
 Le calage de marges consiste ainsi à trouver les poids $\mathbf{w}=(w_{k})_{k \in \mathcal{s}}$ vérifiant :
-$$ 
-\displaystyle \min_{\mathbf{w}} f(\mathbf{w}) \quad \text{s.t.} \quad g(\mathbf{w}) \leq 0 
-$$
-
-
+$\arg\min_{\mathbf{w}} \sum_{k \in \mathcal{s}} f_k(w_k) $.
 
 
 
