@@ -13,6 +13,8 @@ $\arg\min_{\mathbf{w}} \sum_{k \in \mathcal{s}} d_{k}G(\frac{w_{k}}{d_{k}})$, av
 
 Sous la contrainte suivante : $X_{\mathcal{s}}^{'}\mathbf{w}=T_{X}$, où $X_{\mathcal{s}}$ correspond à la matrioce dont les colonnes dont les $X_{j}$ pour les différents individus de $\mathcal{s}$ et $T_{X}$ le vecteur dont chaque élément $j$ correspond à $T(X_{j})$.
 
+# Pseudo-distance functions
+
 Différentes pseudo-distances ou "méthodes de calage" sont proposées:
 - méthode "*linéaire*" : $G(r) = \frac{1}{2}(r-1)^{2}$, cette méthode conduit à une distance de type khi-deux entre les poids $d_{k}$ et $w_{k}$. Cette méthode est la plus rapide, une confergence est assurée à partir de deux itérations avec un algorithme de Newton. Elle peut conduire à des poids $w_{k}$ négatifs, et les poids ne sont pas bornés supérieurement
 - méthode "*raking ratio*" : $G(r) = r\ln(r)-r+1$, cette méthode conduit à une distance de type entropie entre les poids $w_{k}$ et $d_{k}$. Conduit à des poids toujours positifs et non bornés supérieurement. Les poids issus de cette méthode sont généralement supérieurs à ceux de la méthode linéaire
