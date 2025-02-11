@@ -16,7 +16,7 @@ Sous la contrainte suivante : $X_{\mathcal{s}}^{'}\mathbf{w}=T_{X}$, où $X_{\ma
 Différentes pseudo-distances ou "méthodes de calage" sont proposées:
 - méthode "linéaire" : $G(r) = \frac{1}{2}(r-1)^{2}$, cette méthode conduit à une distance de type khi-deux entre les poids $d_{k}$ et $w_{k}$. Cette méthode est la plus rapide, une confergence est assurée à partir de deux itérations avec un algorithme de Newton. Elle peut conduire à des poids $w_{k}$ négatifs, et les poids ne sont pas bornés supérieurement
 - méthode "raking ratio" : $G(r) = r\ln(r)-r+1$, cette méthode conduit à une distance de type entropie entre les poids $w_{k}$ et $d_{k}$. Conduit à des poids toujours positifs et non bornés supérieurement. Les poids issus de cette méthode sont généralement supérieurs à ceux de la méthode linéaire
-- méthode "logit" : méthode tronquée, on choisit deux bornes inférieure et supérieure $L$ et $U$, telles que $L < 1 < U$
+- méthode "logit" : méthode tronquée, on choisit deux bornes inférieure et supérieure $L$ et $U$, telles que $L < 1 < U$, la forme de la pseudo-distance est alors la suivante : $G(r) = [(r-L)\ln(\frac{r-L}{1-L})+(U-r)\ln(\frac{U-r}{U-1})]\frac{1}{A}$
 
 # Margin calibration
 
