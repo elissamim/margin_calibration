@@ -32,15 +32,13 @@ The *logit* and *truncated linear* methods are the most commonly used, as they a
 
 # Penalized margin calibration
 
-L'introduction d'une régularisation permet de faciliter la convergence du programme d'estimation et ainsi d'augmenter le nombre de variables de contrôle tout en préservant une distribution des facteurs de calage peu étendue. En notant $\hat{T_{Xw}}$ l'estimateur des sommes des variables auxiliaires pondérées des poids $w$, soit $\hat{T_{Xw}}=(\sum_{k\in\mathcal{s}}w_{k}x_{jk})$. On se donne également un vecteur de coûts $\mathbf{C}$ dont la taille correspond au nombre de marges, et pour lequel la jème valeur correspond au coût associé à la jème marge. Le problème de calage pénalisé s'écrit alors: 
+Introducing regularization facilitates the convergence of the estimation program, thereby increasing the number of control variables while maintaining a narrow distribution of calibration factors. Let $\hat{T_{Xw}}$ be the estimator of the sums of auxiliary variables weighted by the weights $w$, i.e., $\hat{T_{Xw}}=(\sum_{k\in\mathcal{s}}w_{k}x_{jk})$. We also define a cost vector $\mathbf{C}$ whose size corresponds to the number of margins, and whose j-th value corresponds to the cost associated with the j-th margin. The penalized calibration problem is then formulated as:
+
 $\arg\min_{\mathbf{w}}\sum_{k\in\mathcal{s}}d_{k}G(\frac{w_{k}}{d_{k}})+\lambda(\hat{T_{Xw}}-T_{X})^{'}\text{Diag}(C)(\hat{T_{Xw}}-T_{X})$.
 
-Le paramètre $\lambda$ est compris entre 0 et $+\infty$ et représente l'importance relative dans le programme de la distance aux poids initiaux et de l'acrt aux marges des estimations redressées. Les mêmes pseudo-distances peuvent être utilisées pour un calage pénalisée, notamment lorsque le terme de distance est prépondérant ($\lambda\to0$). Toutefois, lorsque le terme de coût est prépondérant ($\lambda\to+\infty$), il n'est pas nécessaire d'introduire une pseudo-distance avec bornes (*logit*, *truncated linear*), car les contraintes de marges sont satisfaites en priorité ce qui éloigne les facteurs de calage de 1.
+The parameter $\lambda$ ranges between 0 and $+\infty$ and represents the relative importance in the program of the distance to the initial weights and the emphasis on the margins of the adjusted estimates. The same pseudo-distances can be used for penalized calibration, especially when the distance term is predominant ($\lambda\to0$). However, when the cost term is predominant ($\lambda\to+\infty$), it is not necessary to introduce a pseudo-distance with bounds (e.g., *logit*, *truncated linear*), as the margin constraints are satisfied first, which moves the calibration factors away from 1.
 
-Un calage exact sur une marge donnée peut être conduit en associant à cette marge un coût plus important qu'aux autres marges, par exemple un coût infini. 
-
-
-
+An exact calibration on a given margin can be achieved by assigning a higher cost to this margin than to the other margins, for example, an infinite cost.
 
 # Margin calibration on tight bounds
 
