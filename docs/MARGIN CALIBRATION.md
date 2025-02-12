@@ -32,7 +32,7 @@ The *logit* and *truncated linear* methods are the most commonly used, as they a
 
 # Penalized margin calibration
 
-L'introduction d'une régularisation permet de faciliter la convergence du programme d'estimation et ainsi d'augmenter le nombre de variables de contrôle tout en préservant une distribution des facteurs de calage peu étendue. En notant $\hat{T_{Xw}}$
+L'introduction d'une régularisation permet de faciliter la convergence du programme d'estimation et ainsi d'augmenter le nombre de variables de contrôle tout en préservant une distribution des facteurs de calage peu étendue. En notant $\hat{T_{Xw}}$ l'estimateur des sommes des variables auxiliaires pondérées des poids $w$, soit $\hat{T_{Xw}} = (\sum_{k \in \mathcal{s}}w_{k}x_{jk})_{j}$
 
 # Margin calibration on tight bounds
 
