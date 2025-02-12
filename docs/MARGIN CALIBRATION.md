@@ -42,7 +42,9 @@ An exact calibration on a given margin can be achieved by assigning a higher cos
 
 # Margin calibration on tight bounds
 
-$\arg\min_{g}(\max_{k\in\mathcal{s}}g_{k}-\min_{k\in\mathcal{s}}g_{k})$ sous la contrainte : $\tilde{X_{s}}^{'}g=T_{X}$ et $g \geq 0$ avec $\forall k \in \{1, \dots, n \}$ $g_{k}=\frac{w_{k}}{d_{k}}$ et $\tilde{X_{s}}=\text{Diag}(d)X_{s}$
+$\arg\min_{g}(\max_{k\in\mathcal{s}}g_{k}-\min_{k\in\mathcal{s}}g_{k})$ sous la contrainte : $\tilde{X_{s}}^{'}g=T_{X}$ et $g \geq 0$ avec $\forall k \in \{1, \dots, n \}$ $g_{k}=\frac{w_{k}}{d_{k}}$ et $\tilde{X_{s}}=\text{Diag}(d)X_{s}$.
+
+Ce programme est linéaire et peut donc être résolu par la méthode du simplexe, impliquant toutefois une complexité spatiale en $O(n^{2})$.
 
 # References
 
