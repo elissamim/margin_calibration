@@ -42,6 +42,8 @@ An exact calibration on a given margin can be achieved by assigning a higher cos
 
 # Margin calibration on tight bounds
 
+$\arg\min_{g}(\max_{k\in}g_{k})$
+
 # References
 
 - Sautory, O. (2018), Les méthodes de calage. Working paper.
