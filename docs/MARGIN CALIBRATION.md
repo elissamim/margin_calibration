@@ -42,11 +42,17 @@ An exact calibration on a given margin can be achieved by assigning a higher cos
 
 # Margin calibration on tight bounds
 
-Un calage ur bornes serrées permet de reproduire un calage sur marges avec bornes, afin de controler l'amplitude des facteurs de calage. Un tel programme s'écrit comme suit :
+A calibration with tight bounds allows for reproducing a margin calibration with bounds, in order to control the range of the calibration factors. Such a program is written as follows:
 
-$\arg\min_{g}(\max_{k\in\mathcal{s}}g_{k}-\min_{k\in\mathcal{s}}g_{k})$ sous la contrainte : $\tilde{X_{s}}^{'}g=T_{X}$ et $g \geq 0$ avec $\forall k \in \{1, \dots, n \}$ $g_{k}=\frac{w_{k}}{d_{k}}$ et $\tilde{X_{s}}=\text{Diag}(d)X_{s}$.
+$\arg\min_{g}(\max_{k\in\mathcal{s}}g_{k}-\min_{k\in\mathcal{s}}g_{k})$
 
-Ce programme est linéaire et peut donc être résolu par la méthode du simplexe, impliquant toutefois une complexité spatiale en $O(n^{2})$.Une méthode par dichotomie sous-optimale peut être utilisée dans un cas de figure présentant un grand nombre d'observations ($n \geq 10000$). 
+subject to the constraint:
+
+$\tilde{X_{s}}^{'}g=T_{X}$ and $g \geq 0$
+
+with $\forall k \in \{1, \dots, n \}$ $g_{k}=\frac{w_{k}}{d_{k}}$ and $\tilde{X_{s}}=\text{Diag}(d)X_{s}$.
+
+This program is linear and can therefore be solved using the simplex method, although it implies a spatial complexity of $O(n^{2})$. A suboptimal dichotomy method can be used in cases with a large number of observations ($n \geq 10000$).
 
 # References
 
