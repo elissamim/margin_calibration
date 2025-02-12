@@ -42,7 +42,7 @@ An exact calibration on a given margin can be achieved by assigning a higher cos
 
 # Margin calibration on tight bounds
 
-$\arg\min_{g}(\max_{k\in}g_{k}-\min_{k\in}g_{k})$
+$\arg\min_{g}(\max_{k\in\{1...n\}}g_{k}-\min_{k\in\{1...n\}}g_{k})$
 
 # References
 
