@@ -45,6 +45,6 @@ An exact calibration on a given margin can be achieved by assigning a higher cos
 # References
 
 - Sautory, O. (2018), Les méthodes de calage. Working paper.
-- Rebecq, A. (2023), Icarus : un package R pour le calage sur marges et ses variantes. Working paper. http://paperssondages16.sfds.asso.fr/submission_54.pdf
+- Rebecq, A. (2016), Icarus : un package R pour le calage sur marges et ses variantes. Working paper. http://paperssondages16.sfds.asso.fr/submission_54.pdf
 - Rebecq, A. (2023), icarus. GitHub. https://github.com/haroine/icarus
 
