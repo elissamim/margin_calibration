@@ -37,6 +37,6 @@ The *logit* and *truncated linear* methods are the most commonly used, as they a
 # References
 
 - Sautory, O. (2018), Les méthodes de calage. Working paper.
-- Rebecq, A., Icarus : un package R pour le calage sur marges et ses variantes. Working paper. http://paperssondages16.sfds.asso.fr/submission_54.pdf
+- Rebecq, A. (2023), Icarus : un package R pour le calage sur marges et ses variantes. Working paper. http://paperssondages16.sfds.asso.fr/submission_54.pdf
 - Rebecq, A. (2023), icarus. GitHub. https://github.com/haroine/icarus
 
