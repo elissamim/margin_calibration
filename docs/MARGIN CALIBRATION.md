@@ -30,10 +30,12 @@ Different pseudo-distances or "calibration methods" are proposed:
 
 The *logit* and *truncated linear* methods are the most commonly used, as they allow obtaining weights with reasonable magnitudes, including negative weights as is the case with the *linear* method.
 
-# Margin calibration
-
 # Penalized margin calibration
 
 # Margin calibration on tight bounds
 
 # References
+
+- Sautory, O. (2018), Les méthodes de calage. Working paper.
+- Rebecq, A., Icarus : un package R pour le calage sur marges et ses variantes. Working paper. http://paperssondages16.sfds.asso.fr/submission_54.pdf
+
