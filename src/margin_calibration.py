@@ -1,7 +1,11 @@
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
-
+from utils import (
+                    check_nans,
+                    check_zeros,
+                    check_negative_values
+                  )
 
 class MarginCalibration:
     """
@@ -73,7 +77,7 @@ class MarginCalibration:
                 """Input must be a NumPy array or Pandas DataFrame/Series."""
             )
 
-    def initialize_sampling_weights(self):
+    def _initialize_sampling_weights(self):
         """
         Initializes the sampling weights based on the sampling probabilities.
 
@@ -107,7 +111,7 @@ class MarginCalibration:
             float: The computed value based on the raking ratio method.
         """
         epsilon=1e-8
-        return (w / d) * np.log(np.maximum(w / d, epsilon)) - (w / d) + 1
+        return (w / d) * np.log(w / d + epsilon) - (w / d) + 1
 
     def _logit_method(self, w, d):
         """
@@ -123,17 +127,17 @@ class MarginCalibration:
         epsilon = 1e-8
         x = w / d
         a = (x - self.lower_bound) * np.log(
-            np.maximum((x - self.lower_bound) / (1 - self.lower_bound), epsilon)
+            (x - self.lower_bound + epsilon) / (1 - self.lower_bound)
         )
         b = (self.upper_bound - x) * np.log(
-            np.maximum((self.upper_bound - x) / (self.upper_bound - 1), epsilon)
+            (self.upper_bound - x + epsilon) / (self.upper_bound - 1)
         )
         c = (self.upper_bound - self.lower_bound) / (
             (1 - self.lower_bound) * (self.upper_bound - 1)
         )
         return (a + b) / c
 
-    def initialize_method(self):
+    def _initialize_method(self):
         """
         Initializes the appropriate method based on the chosen calibration method.
 
@@ -157,7 +161,7 @@ class MarginCalibration:
                 Must be one of : 'linear', 'raking_ratio', 'truncated_linear'"""
             )
 
-    def objective(self, calibration_weights):
+    def _objective(self, calibration_weights):
         """
         Computes the objective function to minimize during calibration.
 
@@ -172,20 +176,20 @@ class MarginCalibration:
         """
         if (self.penalty is None) and (self.costs is None):
 
-            sampling_weights = self.initialize_sampling_weights()
+            sampling_weights = self._initialize_sampling_weights()
 
             return sum(
-                d_k * self.initialize_method()(w_k, d_k)
+                d_k * self._initialize_method()(w_k, d_k)
                 for w_k, d_k in zip(calibration_weights, sampling_weights)
             )
 
         elif (self.penalty is not None) and (self.costs is not None):
 
-            sampling_weights = self.initialize_sampling_weights()
+            sampling_weights = self._initialize_sampling_weights()
             total_target = self.calibration_target
 
             distance = sum(
-                d_k * self.initialize_method()(w_k, d_k)
+                d_k * self._initialize_method()(w_k, d_k)
                 for w_k, d_k in zip(calibration_weights, sampling_weights)
             )
 
@@ -202,7 +206,7 @@ class MarginCalibration:
                             in case one is given."""
             )
 
-    def constraint(self, calibration_weights):
+    def _constraint(self, calibration_weights):
         """
         Defines the constraint for the optimization problem.
 
@@ -229,6 +233,9 @@ class MarginCalibration:
             OptimizeResult: The result of the optimization process.
         
         Raises:
+            ValueError: If NaNs found in the sampling probabilities vector.
+            ValueError: If 0 values found in the sampling probabilities vector.
+            ValueError: If negative values found in the sampling probabilities vector.
             ValueError: If the lower bound is not strictly less than 1, or the upper bound is not strictly greater than 1 for methods like 'logit'.
             TypeError: If bounds are not numeric values when using methods like 'logit'.
         """
@@ -237,8 +244,35 @@ class MarginCalibration:
         self.calibration_matrix = self._to_numpy(calibration_matrix)
         self.calibration_target = self._to_numpy(calibration_target)
 
+        # Apply basic checks on weights and calibration data
+        check_nans(self.sampling_probabilities,
+                  """
+                  NaN values found in sampling probabilities.
+                  """)
+        check_zeros(self.sampling_probabilities,
+                   """
+                   Zero values found in sampling probabilities.
+                   """)
+        check_negative_values(self.sampling_probabilities,
+                             """
+                             Negative values found in sampling probabilities.
+                             """)
+
+        # Check for NaNs in calibration variables
+        check_nans(self.calibration_matrix,
+                  """
+                  NaN values found in calibration matrix.
+                  """)
+        
+        # Check for NaNs in total margins
+        check_nans(self.calibration_target,
+                  """
+                  NaN values found in calibration target.
+                  """)
+        
+        # Define the constraints for constrained problems
         if (self.penalty is None) and (self.costs is None):
-            constraints = {"type": "eq", "fun": self.constraint}
+            constraints = {"type": "eq", "fun": self._constraint}
         elif (self.penalty is not None) and (self.costs is not None):
             constraints = None
         else:
@@ -247,16 +281,22 @@ class MarginCalibration:
                             in case one is given."""
             )
 
-        x0 = self.initialize_sampling_weights()
+        x0 = self._initialize_sampling_weights()
 
-        if self.calibration_method in ["truncated_linear", "logit"]:
+        if self.calibration_method in ["truncated_linear", "logit", "raking_ratio"]:
             if isinstance(self.lower_bound, (int, float)) and isinstance(
                 self.upper_bound, (int, float)
             ):
-                if (self.lower_bound < 1) and (self.upper_bound > 1):
-                    sampling_weights = self.initialize_sampling_weights()
+                if (self.lower_bound < 1) and (self.upper_bound > 1) and (self.calibration_method in ["truncated_linear", "logit"]):
+                    sampling_weights = self._initialize_sampling_weights()
                     bounds = [
                         (self.lower_bound * d_k, self.upper_bound * d_k)
+                        for d_k in sampling_weights
+                    ]
+                elif (self.lower_bound < 1) and (self.upper_bound > 1) and (self.calibration_method == "raking_ratio"):
+                    sampling_weights = self._initialize_sampling_weights()
+                    bounds = [
+                        (0, None)
                         for d_k in sampling_weights
                     ]
                 else:
@@ -273,7 +313,7 @@ class MarginCalibration:
             bounds = None
 
         return minimize(
-            self.objective,
+            self._objective,
             x0=x0,
             method="trust-constr",
             constraints=constraints,
