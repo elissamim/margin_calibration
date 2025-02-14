@@ -283,20 +283,14 @@ class MarginCalibration:
 
         x0 = self._initialize_sampling_weights()
 
-        if self.calibration_method in ["truncated_linear", "logit", "raking_ratio"]:
+        if self.calibration_method in ["truncated_linear", "logit"]:
             if isinstance(self.lower_bound, (int, float)) and isinstance(
                 self.upper_bound, (int, float)
             ):
-                if (self.lower_bound < 1) and (self.upper_bound > 1) and (self.calibration_method in ["truncated_linear", "logit"]):
+                if (self.lower_bound < 1) and (self.upper_bound > 1):
                     sampling_weights = self._initialize_sampling_weights()
                     bounds = [
                         (self.lower_bound * d_k, self.upper_bound * d_k)
-                        for d_k in sampling_weights
-                    ]
-                elif (self.lower_bound < 1) and (self.upper_bound > 1) and (self.calibration_method == "raking_ratio"):
-                    sampling_weights = self._initialize_sampling_weights()
-                    bounds = [
-                        (0, None)
                         for d_k in sampling_weights
                     ]
                 else:
@@ -309,6 +303,12 @@ class MarginCalibration:
                     """'lower_bound' and 'upper_bound' must be numeric values
                     when using 'truncated_linear' or 'logit' methods"""
                 )
+        elif self.calibration_method == "raking_ratio":
+            sampling_weights = self._initialize_sampling_weights()
+            bounds = [
+                (0, None)
+                for d_k in sampling_weights
+            ]
         else:
             bounds = None
 
