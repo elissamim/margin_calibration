@@ -84,7 +84,7 @@ class MarginCalibration:
         Returns:
             np.ndarray: The initialized sampling weights.
         """
-        return np.array([1 / prob_i for prob_i in self.sampling_probabilities])
+        return 1 / self.sampling_probabilities
 
     def _linear_method(self, w, d):
         """
@@ -111,7 +111,7 @@ class MarginCalibration:
             float: The computed value based on the raking ratio method.
         """
         epsilon=1e-8
-        return (w / d) * np.log((w+epsilon) / d) - (w / d) + 1
+        return (w / d) * np.log(np.maximum(w / d, epsilon)) - (w / d) + 1
 
     def _logit_method(self, w, d):
         """
@@ -127,10 +127,10 @@ class MarginCalibration:
         epsilon = 1e-8
         x = w / d
         a = (x - self.lower_bound) * np.log(
-            (x - self.lower_bound + epsilon) / (1 - self.lower_bound)
+            np.maximum((x - self.lower_bound) / (1 - self.lower_bound), epsilon)
         )
         b = (self.upper_bound - x) * np.log(
-            (self.upper_bound - x + epsilon) / (self.upper_bound - 1)
+            np.maximum((self.upper_bound - x + epsilon) / (self.upper_bound - 1), epsilon)
         )
         c = (self.upper_bound - self.lower_bound) / (
             (1 - self.lower_bound) * (self.upper_bound - 1)
@@ -160,6 +160,17 @@ class MarginCalibration:
                 f"""Invalid value : {self.calibration_method}. 
                 Must be one of : 'linear', 'raking_ratio', 'truncated_linear'"""
             )
+
+    def _compute_jacobian(self, calibration_weights):
+
+        epsilon=1e-8
+        
+        if self.calibration_method in ["linear", "truncated_linear"]:
+            return calibration_weights/self._initialize_sampling_weights()-1
+        elif self.calibration_method == "raking_ratio":
+            return np.log((calibration_weights+epsilon)/self._initialize_sampling_weights())
+        else:
+            return None
 
     def _objective(self, calibration_weights):
         """
@@ -312,10 +323,21 @@ class MarginCalibration:
         else:
             bounds = None
 
-        return minimize(
-            self._objective,
-            x0=x0,
-            method="trust-constr",
-            constraints=constraints,
-            bounds=bounds,
-        )
+        if (self.penalty is None) and (self.costs is None):
+            return minimize(
+                self._objective,
+                x0=x0,
+                method="trust-constr",
+                constraints=constraints,
+                bounds=bounds,
+                jac=self._compute_jacobian
+            )
+        else:
+            return minimize(
+                self._objective,
+                x0=x0,
+                method="trust-constr",
+                constraints=constraints,
+                bounds=bounds
+            )
+            
