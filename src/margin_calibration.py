@@ -130,7 +130,7 @@ class MarginCalibration:
             np.maximum((x - self.lower_bound) / (1 - self.lower_bound), epsilon)
         )
         b = (self.upper_bound - x) * np.log(
-            np.maximum((self.upper_bound - x + epsilon) / (self.upper_bound - 1), epsilon)
+            np.maximum((self.upper_bound - x) / (self.upper_bound - 1), epsilon)
         )
         c = (self.upper_bound - self.lower_bound) / (
             (1 - self.lower_bound) * (self.upper_bound - 1)
@@ -168,7 +168,8 @@ class MarginCalibration:
         if self.calibration_method in ["linear", "truncated_linear"]:
             return calibration_weights/self._initialize_sampling_weights()-1
         elif self.calibration_method == "raking_ratio":
-            return np.log((calibration_weights+epsilon)/self._initialize_sampling_weights())
+            return np.log(np.maximum(calibration_weights/self._initialize_sampling_weights(), 
+                            epsilon))
         else:
             return None
 
