@@ -111,7 +111,7 @@ class MarginCalibration:
             float: The computed value based on the raking ratio method.
         """
         epsilon=1e-8
-        return (w / d) * np.log(w / d + epsilon) - (w / d) + 1
+        return (w / d) * np.log((w+epsilon) / d) - (w / d) + 1
 
     def _logit_method(self, w, d):
         """
