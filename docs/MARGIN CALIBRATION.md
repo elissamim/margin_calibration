@@ -19,7 +19,7 @@ Different pseudo-distances or "calibration methods" are proposed:
 
 - **"*Linear*" method**: $G(r) = \frac{1}{2}(r-1)^{2}$, this method leads to a chi-square-type distance between the weights $d_{k}$ and $w_{k}$. This method is the fastest, with convergence guaranteed after two iterations using a Newton algorithm. It can lead to negative weights $w_{k}$, and the weights are not upper-bounded. The gradient is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$
 
-- **"*Raking ratio*" method**: $G(r) = r\ln(r)-r+1$, this method leads to an entropy-type distance between the weights $w_{k}$ and $d_{k}$. It results in weights that are always positive and not upper-bounded. The weights from this method are generally higher than those from the linear method. The gradient is given by : $(\log(\frac{w_{1}}{d_{1}}))$
+- **"*Raking ratio*" method**: $G(r) = r\ln(r)-r+1$, this method leads to an entropy-type distance between the weights $w_{k}$ and $d_{k}$. It results in weights that are always positive and not upper-bounded. The weights from this method are generally higher than those from the linear method. The gradient is given by : $(\ln(\frac{w_{1}}{d_{1}}), \ldots, \ln(\frac{w_{n}}{d_{n}}))$
 
 - **"*Logit*" method**: A truncated method, where two bounds, lower $L$ and upper $U$, are chosen such that $L < 1 < U$. The form of the pseudo-distance is then as follows:  
   $G(r) = [(r-L)\ln(\frac{r-L}{1-L})+(U-r)\ln(\frac{U-r}{U-1})]\frac{1}{A}$, if $L < r < U$, with $A = \frac{U-L}{(1-L)(U-1)}$.  
