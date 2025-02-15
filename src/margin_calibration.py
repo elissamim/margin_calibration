@@ -172,10 +172,8 @@ class MarginCalibration:
                             epsilon))
         elif self.calibration_method == "logit":
             a = (self.upper_bound - self.lower_bound)/((1 - self.lower_bound)*(self.upper_bound - 1))
-            coeff_1 = (1/a)*(1/self._initialize_sampling_weights())
-            coeff_2 = (self.upper_bound - 1)/(1 - self.lower_bound)
             r = calibration_weights/self._initialize_sampling_weights()
-            return coeff_1 * np.log(np.maximum(coeff_2*(r - self.lower_bound)/(self.upper_bound - r),
+            return 1/a * np.log(np.maximum(coeff_2*(r - self.lower_bound)/(self.upper_bound - r),
                                             epsilon))
         else:
             return None
