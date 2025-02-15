@@ -26,7 +26,7 @@ Different pseudo-distances or "calibration methods" are proposed:
   This method ensures that the ratios $\frac{w_{k}}{d_{k}}$ always remain within the intervals $]L, U[$. However, the values of $L$ and $U$ cannot be chosen arbitrarily. Generally, $L$ must be less than an upper bound $L_{max}$ (less than 1) and $U$ must be greater than a lower bound $U_{min}$ (greater than 1). These values depend on the data and the calibration margins: the more the sample differs from the general population, the further these values are from 1.
 
 - **"*Truncated linear*" method**: A truncated version of the *linear* pseudo-distance that ensures non-negative weights with reasonable magnitudes. The method is given by:  
-  $G(r) = \frac{1}{2}(r-1)^{2}$ with $L \leq r \leq U$ where $L < 1 < U$, and the presence of bounds $L_{max}$ and $U_{min}$.
+  $G(r) = \frac{1}{2}(r-1)^{2}$ with $L \leq r \leq U$ where $L < 1 < U$, and the presence of bounds $L_{max}$ and $U_{min}$. The gradient is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$
 
 The *logit* and *truncated linear* methods are the most commonly used, as they allow obtaining weights with reasonable magnitudes, including negative weights as is the case with the *linear* method.
 
