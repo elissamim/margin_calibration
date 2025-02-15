@@ -17,16 +17,16 @@ Under the following constraint: $X_{\mathcal{s}}^{'}\mathbf{w}=T_{X}$, where $X_
 
 Different pseudo-distances or "calibration methods" are proposed:
 
-- **"*Linear*" method**: $G(r) = \frac{1}{2}(r-1)^{2}$, this method leads to a chi-square-type distance between the weights $d_{k}$ and $w_{k}$. This method is the fastest, with convergence guaranteed after two iterations using a Newton algorithm. It can lead to negative weights $w_{k}$, and the weights are not upper-bounded. The gradient is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$
+- **"*Linear*" method**: $G(r) = \frac{1}{2}(r-1)^{2}$, this method leads to a chi-square-type distance between the weights $d_{k}$ and $w_{k}$. This method is the fastest, with convergence guaranteed after two iterations using a Newton algorithm. It can lead to negative weights $w_{k}$, and the weights are not upper-bounded. The gradient of the objective function using this distance is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$
 
-- **"*Raking ratio*" method**: $G(r) = r\ln(r)-r+1$, this method leads to an entropy-type distance between the weights $w_{k}$ and $d_{k}$. It results in weights that are always positive and not upper-bounded. The weights from this method are generally higher than those from the linear method. The gradient is given by : $(\ln(\frac{w_{1}}{d_{1}}), \ldots, \ln(\frac{w_{n}}{d_{n}}))$
+- **"*Raking ratio*" method**: $G(r) = r\ln(r)-r+1$, this method leads to an entropy-type distance between the weights $w_{k}$ and $d_{k}$. It results in weights that are always positive and not upper-bounded. The weights from this method are generally higher than those from the linear method. The gradient of the objective function using this distance is given by : $(\ln(\frac{w_{1}}{d_{1}}), \ldots, \ln(\frac{w_{n}}{d_{n}}))$
 
 - **"*Logit*" method**: A truncated method, where two bounds, lower $L$ and upper $U$, are chosen such that $L < 1 < U$. The form of the pseudo-distance is then as follows:  
   $G(r) = [(r-L)\ln(\frac{r-L}{1-L})+(U-r)\ln(\frac{U-r}{U-1})]\frac{1}{A}$, if $L < r < U$, with $A = \frac{U-L}{(1-L)(U-1)}$.  
   This method ensures that the ratios $\frac{w_{k}}{d_{k}}$ always remain within the intervals $]L, U[$. However, the values of $L$ and $U$ cannot be chosen arbitrarily. Generally, $L$ must be less than an upper bound $L_{max}$ (less than 1) and $U$ must be greater than a lower bound $U_{min}$ (greater than 1). These values depend on the data and the calibration margins: the more the sample differs from the general population, the further these values are from 1.
 
 - **"*Truncated linear*" method**: A truncated version of the *linear* pseudo-distance that ensures non-negative weights with reasonable magnitudes. The method is given by:  
-  $G(r) = \frac{1}{2}(r-1)^{2}$ with $L \leq r \leq U$ where $L < 1 < U$, and the presence of bounds $L_{max}$ and $U_{min}$. The gradient is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$
+  $G(r) = \frac{1}{2}(r-1)^{2}$ with $L \leq r \leq U$ where $L < 1 < U$, and the presence of bounds $L_{max}$ and $U_{min}$. The gradient of the objective function using this distance is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$
 
 The *logit* and *truncated linear* methods are the most commonly used, as they allow obtaining weights with reasonable magnitudes, including negative weights as is the case with the *linear* method.
 
