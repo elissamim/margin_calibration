@@ -162,21 +162,44 @@ class MarginCalibration:
             )
 
     def _compute_jacobian(self, calibration_weights):
+        """
+        Computes the Jacobian (or rather gradient) for the different methods, 
+        to make optimization faster.
+
+        Args:
+            calibration_weights (np.ndarray): The calibration weights.
+
+        Returns:
+            np.ndarray: The gradient for a given method.
+        """
 
         epsilon=1e-8
         
         if self.calibration_method in ["linear", "truncated_linear"]:
-            return calibration_weights/self._initialize_sampling_weights()-1
+            gradient = calibration_weights/self._initialize_sampling_weights()-1
         elif self.calibration_method == "raking_ratio":
-            return np.log(np.maximum(calibration_weights/self._initialize_sampling_weights(), 
+            gradient = np.log(np.maximum(calibration_weights/self._initialize_sampling_weights(), 
                             epsilon))
         elif self.calibration_method == "logit":
             a = (self.upper_bound - self.lower_bound)/((1 - self.lower_bound)*(self.upper_bound - 1))
             r = calibration_weights/self._initialize_sampling_weights()
-            return 1/a * np.log(np.maximum(coeff_2*(r - self.lower_bound)/(self.upper_bound - r),
+            gradient =  1/a * np.log(np.maximum(coeff_2*(r - self.lower_bound)/(self.upper_bound - r),
                                             epsilon))
         else:
-            return None
+            raise ValueError("""
+                            Gradient computed for 'linear', 'raking_ratio', 'logit', and 'truncated_linear'
+                            distances.
+                            """)
+
+        if (self.penalty is None) and (self.costs is None):
+            return gradient
+        elif (self.penalty is not None) and (self.costs is not None):
+
+        else:
+            raise ValueError(
+                """Both 'penalty' and 'costs' must be given, 
+                            in case one is given."""
+            )
 
     def _objective(self, calibration_weights):
         """
