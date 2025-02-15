@@ -194,7 +194,8 @@ class MarginCalibration:
         if (self.penalty is None) and (self.costs is None):
             return gradient
         elif (self.penalty is not None) and (self.costs is not None):
-
+            penalty_gradient =
+            return gradient + penalty_gradient
         else:
             raise ValueError(
                 """Both 'penalty' and 'costs' must be given, 
@@ -352,21 +353,11 @@ class MarginCalibration:
         else:
             bounds = None
 
-        if (self.penalty is None) and (self.costs is None):
-            return minimize(
-                self._objective,
-                x0=x0,
-                method="trust-constr",
-                constraints=constraints,
-                bounds=bounds,
-                jac=self._compute_jacobian
-            )
-        else:
-            return minimize(
-                self._objective,
-                x0=x0,
-                method="trust-constr",
-                constraints=constraints,
-                bounds=bounds
-            )
-            
+        return minimize(
+            self._objective,
+            x0=x0,
+            method="trust-constr",
+            constraints=constraints,
+            bounds=bounds,
+            jac=self._compute_jacobian
+        )
