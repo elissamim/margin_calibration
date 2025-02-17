@@ -171,6 +171,9 @@ class MarginCalibration:
 
         Returns:
             np.ndarray: The gradient for a given method.
+
+        Raises:
+            ValueError: If penalty and costs not given simultaneously.
         """
 
         epsilon=1e-8
@@ -215,16 +218,19 @@ class MarginCalibration:
 
         Returns:
             np.ndarray: The Hessian matrix for a given method.
+
+        Raises:
+            ValueError: If penalty and costs not given simultaneously.
         """
 
         epsilon = 1e-8
 
         if self.calibration_method in ["linear", "truncated_linear"]:
-            return np.diag(self.sampling_probabilities)
+            hessian = np.diag(self.sampling_probabilities)
         elif self.calibration_method == "raking_ratio":
-            return np.diag(np.where(calibration_weights == 0,
-                                   1/epsilon,
-                                   1/calibration_weights))
+            hessian = np.diag(np.where(calibration_weights == 0,
+                               1/epsilon,
+                               1/calibration_weights))
         elif self.calibration_method == "logit":
             numerator = (1-self.lower_bound)*(self.upper_bound-1)
             denominator_1 = calibration_weights/self._initialize_sampling_weights()-self.lower_bound
@@ -233,8 +239,18 @@ class MarginCalibration:
             denominator = np.where(denominator == 0,
                                   epsilon,
                                   denominator)
-            return np.diag(numerator/denominator)
-        return None
+            hessian = np.diag(numerator/denominator)
+
+        if (self.penalty is None) and (self.costs is None):
+            return hessian
+        elif (self.penalty is not None) and (self.costs is not None):
+            penalty_hessian = 2 * self.penalty * (self.calibration_matrix @ np.diag(self.costs) @ self.calibration_matrix.T)
+            return hessian + penalty_hessian
+        else:
+            raise ValueError(
+                """Both 'penalty' and 'costs' must be given, 
+                in case one is given, for Hessian computation."""
+            )
 
     def _objective(self, calibration_weights):
         """
