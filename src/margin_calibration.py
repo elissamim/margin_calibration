@@ -220,8 +220,20 @@ class MarginCalibration:
         epsilon = 1e-8
 
         if self.calibration_method in ["linear", "truncated_linear"]:
-            
-
+            return np.diag(self.sampling_probabilities)
+        elif self.calibration_method == "raking_ratio":
+            return np.diag(np.where(calibration_weights == 0,
+                                   1/epsilon,
+                                   1/calibration_weights))
+        elif self.calibration_method == "logit":
+            numerator = (1-self.lower_bound)*(self.upper_bound-1)
+            denominator_1 = calibration_weights/self._initialize_sampling_weights()-self.lower_bound
+            denominator_2 = self.upper_bound-calibration_weights/self._initialize_sampling_weights()
+            denominator = denominator_1 * denominator_2
+            denominator = np.where(denominator == 0,
+                                  epsilon,
+                                  denominator)
+            return np.diag(numerator/denominator)
         return None
 
     def _objective(self, calibration_weights):
