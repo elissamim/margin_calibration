@@ -40,7 +40,7 @@ The parameter $\lambda$ ranges between 0 and $+\infty$ and represents the relati
 
 An exact calibration on a given margin can be achieved by assigning a higher cost to this margin than to the other margins, for example, an infinite cost.
 
-The gradient associated with the penalty term is given by : $2\lambdaX\text{Diag}(C)X'(\mathbf{w} - \mathbf{1})$
+The gradient associated with the penalty term is given by : $2\lambda X \text{Diag}(C) X'(\mathbf{w} - \mathbf{1})$
 
 # Margin calibration on tight bounds
 
