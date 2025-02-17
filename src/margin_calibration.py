@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from utils import check_nans, check_negative_values, check_zeros
+from utils import check_nans, check_negative_values, check_zeros, plot_density
 
 
 class MarginCalibration:
@@ -31,6 +31,7 @@ class MarginCalibration:
         upper_bound=None,
         penalty=None,
         costs=None,
+        plot=True,
     ):
         """
         Initializes the MarginCalibration object.
@@ -41,12 +42,14 @@ class MarginCalibration:
             upper_bound (float or None): The upper bound for calibration methods requiring it (e.g., 'logit').
             penalty (float or None): Penalty for cost-based optimization.
             costs (array-like or None): The cost matrix to be used in optimization.
+            plot (bool) : If set to True plot the distribution of the calibration factors, if set to False no plot will be made.
         """
         self.calibration_method = calibration_method
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.penalty = penalty
         self.costs = costs
+        self.plot = plot
 
     def _to_numpy(self, data: pd.DataFrame) -> np.ndarray:
         """
@@ -438,7 +441,7 @@ class MarginCalibration:
         else:
             bounds = None
 
-        return minimize(
+        result =  minimize(
             self._objective,
             x0=x0,
             method="trust-constr",
@@ -447,3 +450,9 @@ class MarginCalibration:
             jac=self._compute_jacobian,
             hess=self._compute_hessian,
         )
+
+        # If asked for print the distribution of the calibration factors
+        if self.plot:
+            plot_density(result.x/self._initialize_sampling_weights())
+            
+        return result.x

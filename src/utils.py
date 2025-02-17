@@ -59,7 +59,13 @@ def check_negative_values(arr: np.ndarray, error_message: Optional[str] = None) 
 
 def plot_density(arr: np.ndarray) -> None:
     """
+    Plots the density distribution of an array.
 
+    Args:
+        arr (np.ndarray) : The input array containing the data to plot..
+
+    Returns:
+        None.
     """
 
     sns.set_style("white")
