@@ -17,7 +17,7 @@ Under the following constraint: $X_{\mathcal{s}}^{'}\mathbf{w}=T_{X}$, where $X_
 
 Different pseudo-distances or "calibration methods" are proposed:
 
-- **"*Linear*" method**: $G(r) = \frac{1}{2}(r-1)^{2}$, this method leads to a chi-square-type distance between the weights $d_{k}$ and $w_{k}$. This method is the fastest, with convergence guaranteed after two iterations using a Newton algorithm. It can lead to negative weights $w_{k}$, and the weights are not upper-bounded. The gradient of the objective function using this distance is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$
+- **"*Linear*" method**: $G(r) = \frac{1}{2}(r-1)^{2}$, this method leads to a chi-square-type distance between the weights $d_{k}$ and $w_{k}$. This method is the fastest, with convergence guaranteed after two iterations using a Newton algorithm. It can lead to negative weights $w_{k}$, and the weights are not upper-bounded. The gradient of the objective function using this distance is given by : $(\frac{w_{1}}{d_{1}}-1, \ldots, \frac{w_{n}}{d_{n}}-1)$ and the Hessian matrix is given by : $\text{Diag}(\frac{1}{d_{1}}, \ldots, \frac{1}{d_{n}}) = \text{Diag}(\pi_{1}, \ldots, \pi_{n})$
 
 - **"*Raking ratio*" method**: $G(r) = r\ln(r)-r+1$, this method leads to an entropy-type distance between the weights $w_{k}$ and $d_{k}$. It results in weights that are always positive and not upper-bounded. The weights from this method are generally higher than those from the linear method. The gradient of the objective function using this distance is given by : $(\ln(\frac{w_{1}}{d_{1}}), \ldots, \ln(\frac{w_{n}}{d_{n}}))$
 
