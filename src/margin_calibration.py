@@ -183,7 +183,7 @@ class MarginCalibration:
         elif self.calibration_method == "logit":
             a = (self.upper_bound - self.lower_bound)/((1 - self.lower_bound)*(self.upper_bound - 1))
             r = calibration_weights/self._initialize_sampling_weights()
-            gradient =  1/a * np.log(np.maximum(coeff_2*(r - self.lower_bound)/(self.upper_bound - r),
+            gradient =  1/a * np.log(np.maximum((r - self.lower_bound)/(self.upper_bound - r)*(self.upper_bound-1)/(1-self.lower_bound),
                                             epsilon))
         else:
             raise ValueError("""
@@ -196,7 +196,7 @@ class MarginCalibration:
         elif (self.penalty is not None) and (self.costs is not None):
             w_minus_1= calibration_weights - 1
             XT_w = self.calibration_matrix.T @ w_minus_1
-            C_XT_w = np.diag(self.costs)
+            C_XT_w = np.diag(self.costs) @ XT_w
             penalty_gradient = 2*self.penalty*(self.calibration_matrix @ C_XT_w)
             return gradient + penalty_gradient
         else:
