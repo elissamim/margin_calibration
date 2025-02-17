@@ -194,12 +194,15 @@ class MarginCalibration:
         if (self.penalty is None) and (self.costs is None):
             return gradient
         elif (self.penalty is not None) and (self.costs is not None):
-            penalty_gradient =
+            w_minus_1= calibration_weights - 1
+            XT_w = self.calibration_matrix.T @ w_minus_1
+            C_XT_w = np.diag(self.costs)
+            penalty_gradient = 2*self.penalty*(self.calibration_matrix @ C_XT_w)
             return gradient + penalty_gradient
         else:
             raise ValueError(
                 """Both 'penalty' and 'costs' must be given, 
-                            in case one is given."""
+                            in case one is given, for Jacobian computation."""
             )
 
     def _objective(self, calibration_weights):
