@@ -205,6 +205,24 @@ class MarginCalibration:
                             in case one is given, for Jacobian computation."""
             )
 
+    def _compute_hessian(self, calibration_weights):
+        """
+        Computes the Hessian for the different methods,
+        to make optimization faster.
+
+        Args:
+            calibration_weights (np.ndarray): The calibration weights.
+
+        Returns:
+            np.ndarray: The Hessian matrix for a given method.
+        """
+
+        epsilon = 1e-8
+
+        if self.calibration_method in ["linear", "truncated_linear"]:
+
+        return None
+
     def _objective(self, calibration_weights):
         """
         Computes the objective function to minimize during calibration.
@@ -362,5 +380,6 @@ class MarginCalibration:
             method="trust-constr",
             constraints=constraints,
             bounds=bounds,
-            jac=self._compute_jacobian
+            jac=self._compute_jacobian,
+            hess=self._compute_hessian,
         )
