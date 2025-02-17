@@ -220,6 +220,7 @@ class MarginCalibration:
         epsilon = 1e-8
 
         if self.calibration_method in ["linear", "truncated_linear"]:
+            
 
         return None
 
