@@ -56,6 +56,10 @@ with $\forall k \in \{1, \dots, n \}$ $g_{k}=\frac{w_{k}}{d_{k}}$ and $\tilde{X_
 
 This program is linear and can therefore be solved using the simplex method, although it implies a spatial complexity of $O(n^{2})$. A suboptimal dichotomy method can be used in cases with a large number of observations ($n \geq 10000$).
 
+# Optimization protocol
+
+The different problems are resolved using "*trust-constr*" algorithm in *scipy.optimize.minimize* and the gradients and Hessian matrices are also provided to make computation faster.
+
 # References
 
 - Sautory, O. (2018), Les méthodes de calage. Working paper.
