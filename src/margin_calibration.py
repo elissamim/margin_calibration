@@ -1,24 +1,22 @@
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
-from utils import (
-                    check_nans,
-                    check_zeros,
-                    check_negative_values
-                  )
+
+from utils import check_nans, check_negative_values, check_zeros
+
 
 class MarginCalibration:
     """
     A class for calibrating weights based on different calibration methods.
 
     The class provides methods for weight calibration based on linear,
-    raking ratio, truncated linear, or logit methods, with options for 
-    penalty and cost constraints. The calibration process involves 
-    optimizing an objective function to match sampling probabilities to 
+    raking ratio, truncated linear, or logit methods, with options for
+    penalty and cost constraints. The calibration process involves
+    optimizing an objective function to match sampling probabilities to
     a calibration target.
 
     Attributes:
-        calibration_method (str): The calibration method to use. Must be one of 
+        calibration_method (str): The calibration method to use. Must be one of
                                   'linear', 'raking_ratio', 'truncated_linear', or 'logit'.
         lower_bound (float or None): The lower bound for methods like 'logit'.
         upper_bound (float or None): The upper bound for methods like 'logit'.
@@ -110,7 +108,7 @@ class MarginCalibration:
         Returns:
             float: The computed value based on the raking ratio method.
         """
-        epsilon=1e-8
+        epsilon = 1e-8
         return (w / d) * np.log(np.maximum(w / d, epsilon)) - (w / d) + 1
 
     def _logit_method(self, w, d):
@@ -143,7 +141,7 @@ class MarginCalibration:
 
         Returns:
             function: The method to use for calibration (e.g., linear, raking_ratio, logit).
-        
+
         Raises:
             ValueError: If an invalid calibration method is provided.
         """
@@ -163,7 +161,7 @@ class MarginCalibration:
 
     def _compute_jacobian(self, calibration_weights):
         """
-        Computes the Jacobian (or rather gradient) for the different methods, 
+        Computes the Jacobian (or rather gradient) for the different methods,
         to make optimization faster.
 
         Args:
@@ -176,31 +174,49 @@ class MarginCalibration:
             ValueError: If penalty and costs not given simultaneously.
         """
 
-        epsilon=1e-8
-        
+        epsilon = 1e-8
+
         if self.calibration_method in ["linear", "truncated_linear"]:
-            gradient = calibration_weights/self._initialize_sampling_weights()-1
+            gradient = calibration_weights / self._initialize_sampling_weights() - 1
         elif self.calibration_method == "raking_ratio":
-            gradient = np.log(np.maximum(calibration_weights/self._initialize_sampling_weights(), 
-                            epsilon))
+            gradient = np.log(
+                np.maximum(
+                    calibration_weights / self._initialize_sampling_weights(), epsilon
+                )
+            )
         elif self.calibration_method == "logit":
-            a = (self.upper_bound - self.lower_bound)/((1 - self.lower_bound)*(self.upper_bound - 1))
-            r = calibration_weights/self._initialize_sampling_weights()
-            gradient =  1/a * np.log(np.maximum((r - self.lower_bound)/(self.upper_bound - r)*(self.upper_bound-1)/(1-self.lower_bound),
-                                            epsilon))
+            a = (self.upper_bound - self.lower_bound) / (
+                (1 - self.lower_bound) * (self.upper_bound - 1)
+            )
+            r = calibration_weights / self._initialize_sampling_weights()
+            gradient = (
+                1
+                / a
+                * np.log(
+                    np.maximum(
+                        (r - self.lower_bound)
+                        / (self.upper_bound - r)
+                        * (self.upper_bound - 1)
+                        / (1 - self.lower_bound),
+                        epsilon,
+                    )
+                )
+            )
         else:
-            raise ValueError("""
+            raise ValueError(
+                """
                             Gradient computed for 'linear', 'raking_ratio', 'logit', and 'truncated_linear'
                             distances.
-                            """)
+                            """
+            )
 
         if (self.penalty is None) and (self.costs is None):
             return gradient
         elif (self.penalty is not None) and (self.costs is not None):
-            w_minus_1= calibration_weights - 1
+            w_minus_1 = calibration_weights - 1
             XT_w = self.calibration_matrix.T @ w_minus_1
             C_XT_w = np.diag(self.costs) @ XT_w
-            penalty_gradient = 2*self.penalty*(self.calibration_matrix @ C_XT_w)
+            penalty_gradient = 2 * self.penalty * (self.calibration_matrix @ C_XT_w)
             return gradient + penalty_gradient
         else:
             raise ValueError(
@@ -228,23 +244,35 @@ class MarginCalibration:
         if self.calibration_method in ["linear", "truncated_linear"]:
             hessian = np.diag(self.sampling_probabilities)
         elif self.calibration_method == "raking_ratio":
-            hessian = np.diag(np.where(calibration_weights == 0,
-                               1/epsilon,
-                               1/calibration_weights))
+            hessian = np.diag(
+                np.where(calibration_weights == 0, 1 / epsilon, 1 / calibration_weights)
+            )
         elif self.calibration_method == "logit":
-            numerator = (1-self.lower_bound)*(self.upper_bound-1)
-            denominator_1 = calibration_weights/self._initialize_sampling_weights()-self.lower_bound
-            denominator_2 = self.upper_bound-calibration_weights/self._initialize_sampling_weights()
+            numerator = (1 - self.lower_bound) * (self.upper_bound - 1)
+            denominator_1 = (
+                calibration_weights / self._initialize_sampling_weights()
+                - self.lower_bound
+            )
+            denominator_2 = (
+                self.upper_bound
+                - calibration_weights / self._initialize_sampling_weights()
+            )
             denominator = denominator_1 * denominator_2
-            denominator = np.where(denominator == 0,
-                                  epsilon,
-                                  denominator)
-            hessian = np.diag(numerator/denominator)
+            denominator = np.where(denominator == 0, epsilon, denominator)
+            hessian = np.diag(numerator / denominator)
 
         if (self.penalty is None) and (self.costs is None):
             return hessian
         elif (self.penalty is not None) and (self.costs is not None):
-            penalty_hessian = 2 * self.penalty * (self.calibration_matrix @ np.diag(self.costs) @ self.calibration_matrix.T)
+            penalty_hessian = (
+                2
+                * self.penalty
+                * (
+                    self.calibration_matrix
+                    @ np.diag(self.costs)
+                    @ self.calibration_matrix.T
+                )
+            )
             return hessian + penalty_hessian
         else:
             raise ValueError(
@@ -261,7 +289,7 @@ class MarginCalibration:
 
         Returns:
             float: The value of the objective function (sum of distances, possibly with penalty).
-        
+
         Raises:
             ValueError: If only one of 'penalty' or 'costs' is provided.
         """
@@ -322,7 +350,7 @@ class MarginCalibration:
 
         Returns:
             OptimizeResult: The result of the optimization process.
-        
+
         Raises:
             ValueError: If NaNs found in the sampling probabilities vector.
             ValueError: If 0 values found in the sampling probabilities vector.
@@ -336,31 +364,41 @@ class MarginCalibration:
         self.calibration_target = self._to_numpy(calibration_target)
 
         # Apply basic checks on weights and calibration data
-        check_nans(self.sampling_probabilities,
-                  """
+        check_nans(
+            self.sampling_probabilities,
+            """
                   NaN values found in sampling probabilities.
-                  """)
-        check_zeros(self.sampling_probabilities,
-                   """
+                  """,
+        )
+        check_zeros(
+            self.sampling_probabilities,
+            """
                    Zero values found in sampling probabilities.
-                   """)
-        check_negative_values(self.sampling_probabilities,
-                             """
+                   """,
+        )
+        check_negative_values(
+            self.sampling_probabilities,
+            """
                              Negative values found in sampling probabilities.
-                             """)
+                             """,
+        )
 
         # Check for NaNs in calibration variables
-        check_nans(self.calibration_matrix,
-                  """
+        check_nans(
+            self.calibration_matrix,
+            """
                   NaN values found in calibration matrix.
-                  """)
-        
+                  """,
+        )
+
         # Check for NaNs in total margins
-        check_nans(self.calibration_target,
-                  """
+        check_nans(
+            self.calibration_target,
+            """
                   NaN values found in calibration target.
-                  """)
-        
+                  """,
+        )
+
         # Define the constraints for constrained problems
         if (self.penalty is None) and (self.costs is None):
             constraints = {"type": "eq", "fun": self._constraint}
@@ -396,10 +434,7 @@ class MarginCalibration:
                 )
         elif self.calibration_method == "raking_ratio":
             sampling_weights = self._initialize_sampling_weights()
-            bounds = [
-                (0, None)
-                for d_k in sampling_weights
-            ]
+            bounds = [(0, None) for d_k in sampling_weights]
         else:
             bounds = None
 
