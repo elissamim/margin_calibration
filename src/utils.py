@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from typing import Optional
 
 def check_nans(arr: np.ndarray, error_message: Optional[str] = None) -> None:
@@ -54,3 +56,30 @@ def check_negative_values(arr: np.ndarray, error_message: Optional[str] = None) 
     if (arr < 0).any():
         raise ValueError(error_message or "Negative values in the vector")
     return None
+
+def plot_density(arr: np.ndarray) -> None:
+    """
+
+    """
+
+    sns.set_style("white")
+
+    plt.figure()
+
+    ax = sns.kdeplot(
+        arr,
+        fill=True,
+        alpha=.5,
+        linewidth=1.25,
+        color="#FF6666",
+        bw_adjust=2
+    )
+
+    plt.xlabel("Calibration factors (w/d)")
+    plt.ylabel("Density")
+    plt.title("Density plot of the calibration factors")
+    plt.tight_layout()
+
+    plt.show()
+    
+    
