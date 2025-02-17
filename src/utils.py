@@ -77,7 +77,7 @@ def plot_density(arr: np.ndarray) -> None:
         fill=True,
         alpha=.5,
         linewidth=1.25,
-        color="#FF6666",
+        color="#096c45",
         bw_adjust=2
     )
 
